@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class 3EB | The 29 Legends</title>
+    
+    <!-- Load Tailwind CSS for modern design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts for premium typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Load FontAwesome for beautiful icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #3b82f6; /* Blue */
+            --secondary: #8b5cf6; /* Purple */
+            --gold: #f59e0b; /* Amber Gold for Special VIP Card */
+        }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #020617; /* Slate 950 */
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        /* Interactive Particle Network Background */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Modern Glassmorphism Card Style */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(139, 92, 246, 0.4);
+            box-shadow: 0 12px 30px -10px rgba(139, 92, 246, 0.3);
+            background: rgba(15, 23, 42, 0.6);
+        }
+
+        /* GOLDEN BORDER HIGHLIGHT - Exclusively for Sabri (#28) */
+        /* Fixed: Keeping custom border styling separate from entering fade opacity so he never disappears! */
+        .gold-border-highlight {
+            border: 1.5px solid rgba(245, 158, 11, 0.6) !important;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.15);
+        }
+        
+        .gold-border-highlight:hover {
+            border-color: rgba(245, 158, 11, 1) !important;
+            box-shadow: 0 12px 35px -10px rgba(245, 158, 11, 0.4) !important;
+        }
+
+        /* Custom Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        /* Staggered Smooth Fade-In Animation for Cards */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up {
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        /* Glowing Pulsing Circle for Sabri's profile avatar */
+        @keyframes gold-glow-pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0px rgba(245, 158, 11, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(245, 158, 11, 0);
+            }
+        }
+        .sabri-glow {
+            animation: gold-glow-pulse 2s infinite ease-in-out;
+        }
+
+        /* Avatar overlay trigger on hover */
+        .avatar-container:hover .avatar-overlay {
+            opacity: 1;
+        }
+
+        /* Form input styling with custom glows */
+        .admin-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-purple-500 selection:text-white relative min-h-screen flex flex-col">
+
+    <!-- Interactive Canvas Particle Background -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Navigation / Header -->
+    <nav class="w-full fixed top-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 flex items-center gap-2">
+                <i class="fa-solid fa-graduation-cap"></i> 3EB
+            </div>
+            
+            <div class="flex items-center gap-2 sm:gap-4">
+                <!-- Admin Lock Toggle -->
+                <button id="admin-lock-btn" onclick="toggleAdminPrompt()" class="text-xs font-bold transition px-3.5 py-2 rounded-xl flex items-center gap-2 bg-slate-900 border border-slate-700/60 text-slate-300 hover:border-purple-500/50">
+                    <span id="admin-indicator-dot" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                    <i id="admin-lock-icon" class="fa-solid fa-lock text-slate-400"></i>
+                    <span id="admin-btn-text">Admin Mode</span>
+                </button>
+
+                <!-- Reset Button -->
+                <button onclick="confirmResetDialog()" class="text-xs font-semibold text-slate-400 hover:text-red-400 transition bg-slate-900/40 hover:bg-red-950/20 px-3 py-2 rounded-xl border border-slate-700/50 flex items-center gap-1.5" title="Reset customized rosters">
+                    <i class="fa-solid fa-arrows-rotate"></i> <span class="hidden sm:inline">Reset</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative pt-32 pb-12 lg:pt-40 lg:pb-16 px-6 flex flex-col items-center justify-center text-center min-h-[40vh]">
+        <div class="absolute inset-0 bg-gradient-to-b from-purple-500/10 via-transparent to-transparent -z-10"></div>
+        
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-medium mb-6">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
+            </span>
+            29 Minds, 1 Brotherhood
+        </div>
+        
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-black mb-6 tracking-tight">
+            The Legend of <br />
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-500 to-amber-400 drop-shadow-sm">
+                Class 3EB
+            </span>
+        </h1>
+        
+        <p class="text-base md:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+            Welcome to our premium yearbook workspace.</p>
+    </header>
+
+    <!-- Custom Toast Notification Box -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 ease-out bg-slate-900/95 border border-slate-800 rounded-2xl px-5 py-4 shadow-2xl flex items-center gap-3 backdrop-blur-md">
+        <span id="toast-icon" class="text-emerald-400 text-xl"><i class="fa-solid fa-circle-check"></i></span>
+        <span id="toast-message" class="text-slate-200 text-sm font-semibold">Action complete!</span>
+    </div>
+
+    <!-- Hidden file input for uploading images inside editor -->
+    <input type="file" id="universal-file-input" accept="image/*" class="hidden">
+
+    <!-- Roster Section -->
+    <main class="max-w-7xl mx-auto px-6 py-4 mb-24 flex-grow w-full">
+        <div class="flex items-center justify-between mb-10 border-b border-white/5 pb-4">
+            <h2 class="text-2xl md:text-3xl font-black flex items-center gap-3">
+                <i class="fa-solid fa-users text-purple-500 text-2xl"></i>
+                The 29 Founders
+            </h2>
+            <div class="text-slate-400 font-bold">
+                <span id="count-display" class="text-white text-xl">29</span> / 29 Active
+            </div>
+        </div>
+
+        <!-- Grid Container for Students -->
+        <div id="roster-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+            <!-- Dynamically populated roster cards appear here -->
+        </div>
+    </main>
+
+    <!-- Admin Login PIN Dialog -->
+    <div id="pin-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-950/80 backdrop-blur-md px-6">
+        <div class="glass-card max-w-sm w-full p-6 rounded-2xl border border-purple-500/30 text-center">
+            <div class="w-12 h-12 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-full flex items-center justify-center text-xl mx-auto mb-4">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3 class="text-lg font-bold mb-1 text-white">Unlock Admin Access</h3>
+            <p class="text-slate-400 text-xs mb-5">Enter PIN code to authorize page modifications</p>
+            
+            <div class="mb-4">
+                <input type="password" id="admin-pin-field" placeholder="••••••••" class="admin-input w-full bg-slate-900 border border-slate-800 text-white rounded-xl py-3 px-4 text-center font-mono tracking-widest text-lg">
+                <p id="pin-error-msg" class="text-red-400 text-xs mt-2 hidden">Incorrect passcode, try again.</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <button onclick="closePinModal()" class="w-1/2 py-2.5 rounded-xl text-slate-300 bg-slate-800 hover:bg-slate-700 font-semibold transition text-sm">Cancel</button>
+                <button onclick="submitPinCheck()" class="w-1/2 py-2.5 rounded-xl text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 font-semibold transition text-sm">Verify</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Student Profile Editor Modal -->
+    <div id="edit-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-950/80 backdrop-blur-md px-6">
+        <div class="glass-card max-w-md w-full p-6 rounded-3xl border border-blue-500/30">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-user-pen text-blue-400"></i> Edit Student Card
+                </h3>
+                <button onclick="closeEditModal()" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <!-- Avatar Preview Selector inside modal -->
+            <div class="flex flex-col items-center justify-center mb-6">
+                <div class="relative group cursor-pointer" onclick="triggerEditorUpload()">
+                    <div id="modal-avatar-frame" class="w-24 h-24 rounded-full overflow-hidden border-2 border-dashed border-slate-700 flex items-center justify-center bg-slate-900 relative">
+                        <!-- Placed dynamically -->
+                    </div>
+                    <div class="absolute inset-0 bg-slate-950/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-150">
+                        <i class="fa-solid fa-camera text-white text-lg"></i>
+                    </div>
+                </div>
+                <span class="text-xs text-slate-400 mt-2">Click profile circle to select device photo</span>
+            </div>
+
+            <!-- Editor Inputs -->
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Student Name</label>
+                    <input type="text" id="edit-name-field" class="admin-input w-full bg-slate-900 border border-slate-800 text-white rounded-xl py-2.5 px-3.5 text-sm capitalize">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Instagram Handle / Link</label>
+                    <div class="relative">
+                        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm"><i class="fa-brands fa-instagram"></i></span>
+                        <input type="text" id="edit-insta-field" placeholder="username (e.g. abanob_3eb)" class="admin-input w-full bg-slate-900 border border-slate-800 text-white rounded-xl py-2.5 pl-10 pr-3.5 text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Snapchat / TikTok or Custom Link</label>
+                    <div class="relative">
+                        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm"><i class="fa-solid fa-link"></i></span>
+                        <input type="text" id="edit-custom-field" placeholder="https://example.com" class="admin-input w-full bg-slate-900 border border-slate-800 text-white rounded-xl py-2.5 pl-10 pr-3.5 text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="closeEditModal()" class="w-1/2 py-3 rounded-xl text-slate-300 bg-slate-800 hover:bg-slate-700 font-semibold transition text-sm">Cancel</button>
+                <button onclick="saveStudentEdits()" class="w-1/2 py-3 rounded-xl text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 font-semibold transition text-sm">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Dialog Box Confirmation -->
+    <div id="confirm-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-950/80 backdrop-blur-md px-6">
+        <div class="glass-card max-w-md w-full p-6 rounded-2xl border border-red-500/30 text-center">
+            <div class="w-14 h-14 bg-red-500/10 border border-red-500/20 text-red-500 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2 text-white">Reset All Customs?</h3>
+            <p class="text-slate-400 text-sm mb-6 leading-relaxed">Are you sure you want to delete all customized photos, links, and student name edits? This action is permanent.</p>
+            <div class="flex items-center gap-3 justify-center">
+                <button id="cancel-confirm-btn" class="px-5 py-2 rounded-xl text-slate-300 bg-slate-800 hover:bg-slate-700 font-semibold transition text-sm">Cancel</button>
+                <button id="execute-confirm-btn" class="px-5 py-2 rounded-xl text-white bg-red-600 hover:bg-red-500 font-semibold transition text-sm">Delete All</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 bg-slate-950/80 backdrop-blur-md py-10 text-center relative overflow-hidden mt-auto">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-50"></div>
+        <p class="text-slate-500 text-sm">© 2026 Class 3EB. High school premium portfolio workspace. Auto-saved locally.</p>
+    </footer>
+
+    <script>
+        // Exact 29 ordered student roster
+        const defaultStudentNames = [
+            "abanob", "boda", "boudy", "abdalla", "domma", "ahmed", 
+            "anas", "angalos", "arsanios", "beshoy", "ballo", "il sisi", 
+            "eyad", "fady", "george", "girgs", "jouvanny", "joseph", 
+            "jovanny nino", "kirolos", "michele", "micheal", "mina", 
+            "moaz", "mohamed", "nagy", "omar", "sabri", "smaan"
+        ];
+
+        /* =========================================================================
+           🚀 THE HARDCODING ZONE (For Live Web Deployment)
+           =========================================================================
+           If you upload photos and details through Admin Mode on your phone, they
+           save *only* to your own web browser's storage (LocalStorage).
+           
+           To make sure the entire class sees everyone's pictures and links automatically
+           when they visit your online link, pre-fill these variables!
+           
+           Examples:
+           
+           1. HARDCODED NAMES:
+              let customNames = {
+                  28: "Sabri Rami",
+                  1: "Abanob George"
+              };
+              
+           2. HARDCODED LINKS:
+              let customLinks = {
+                  28: { insta: "sabri_rami_handle", other: "https://tiktok.com/@sabri" },
+                  1: { insta: "abanob_handle", other: "" }
+              };
+              
+           3. HARDCODED PHOTO LINKS:
+              (Upload photos to a site like Postimages.org and paste the Direct Link here)
+              let customPhotos = {
+                  28: "https://i.postimg.cc/sabri-pic.jpg",
+                  1: "https://i.postimg.cc/abanob-pic.jpg"
+              };
+           ========================================================================= */
+
+        let customPhotos = {};
+        let customNames = {
+            28: "Sabri Rami" // Auto-setting Sabri Rami at #28
+        };
+        let customLinks = {}; 
+
+        /* ========================================================================= */
+
+        // High-end card gradient backgrounds
+        const gradients = [
+            "from-blue-600 to-purple-600",
+            "from-pink-500 to-rose-500",
+            "from-purple-600 to-indigo-600",
+            "from-emerald-500 to-teal-500",
+            "from-amber-500 to-orange-600",
+            "from-cyan-500 to-blue-600",
+            "from-violet-600 to-fuchsia-600",
+            "from-red-500 to-pink-600"
+        ];
+
+        let isAdminActive = false; 
+        const rosterGrid = document.getElementById('roster-grid');
+        let currentEditingId = null; 
+        let tempAvatarDataURL = null; 
+
+        // Load Locally-Saved Content
+        function loadSavedState() {
+            try {
+                const photos = localStorage.getItem('3eb-student-photos');
+                const names = localStorage.getItem('3eb-student-names');
+                const links = localStorage.getItem('3eb-student-links');
+                const adminSession = sessionStorage.getItem('3eb-admin-active');
+
+                // Load database values but prioritize hardcoded arrays above if defined
+                if (photos) customPhotos = Object.assign(JSON.parse(photos), customPhotos);
+                if (names) customNames = Object.assign(JSON.parse(names), customNames);
+                if (links) customLinks = Object.assign(JSON.parse(links), customLinks);
+                
+                if (adminSession === 'true') {
+                    isAdminActive = true;
+                    setAdminUIState(true);
+                }
+            } catch (err) {
+                console.error("Local Storage fallback loaded.", err);
+            }
+        }
+
+        // Safe initials parser
+        function getInitials(name) {
+            if (!name || typeof name !== 'string') return "3E";
+            const parts = name.trim().split(/\s+/);
+            if (parts.length >= 2 && parts[0] && parts[1]) {
+                return (parts[0][0] + parts[1][0]).toUpperCase();
+            }
+            return parts[0] ? parts[0].substring(0, Math.min(2, parts[0].length)).toUpperCase() : "3E";
+        }
+
+        // HTML Generation for Grid Items
+        function renderRoster() {
+            rosterGrid.innerHTML = defaultStudentNames.map((defName, index) => {
+                const id = index + 1;
+                
+                // Get correct display names
+                const displayName = (customNames[id] && customNames[id].trim()) ? customNames[id].trim() : defName;
+                const savedPhoto = customPhotos[id];
+                const studentSocials = customLinks[id] || { insta: "", other: "" };
+                
+                // Sabri (#28) highlight logic
+                const isSpecial = (id === 28); 
+                const cardDelay = (index * 0.04) + 's';
+                
+                // CSS configuration for VIP high-tier elements
+                const specialCardClass = isSpecial ? 'gold-border-highlight' : 'border-white/10';
+                const specialTextGlow = isSpecial ? 'text-amber-400 font-extrabold tracking-wider uppercase' : 'text-slate-400 font-medium capitalize';
+                const specialAvatarRing = isSpecial ? 'p-1 bg-gradient-to-tr from-amber-400 to-orange-500 sabri-glow' : 'p-0.5 bg-gradient-to-br from-slate-700/60 to-slate-900/60';
+                
+                const gradientIndex = index % gradients.length;
+                
+                let avatarHTML = '';
+                if (savedPhoto) {
+                    avatarHTML = `
+                        <img id="avatar-img-${id}" src="${savedPhoto}" alt="${displayName}" class="w-full h-full rounded-full object-cover">
+                    `;
+                } else {
+                    avatarHTML = `
+                        <div id="avatar-placeholder-${id}" class="w-full h-full rounded-full bg-gradient-to-br ${gradients[gradientIndex]} flex items-center justify-center text-white text-3xl font-black tracking-tighter shadow-inner">
+                            ${getInitials(displayName)}
+                        </div>
+                    `;
+                }
+
+                let instaBadge = '';
+                if (studentSocials.insta) {
+                    const cleanHandle = studentSocials.insta.replace('@', '').trim();
+                    const targetURL = cleanHandle.startsWith('http') ? cleanHandle : `https://instagram.com/${cleanHandle}`;
+                    instaBadge = `
+                        <a href="${targetURL}" target="_blank" class="w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-amber-500 text-white flex items-center justify-center hover:scale-110 transition duration-150 text-sm shadow-md" title="Instagram: @${cleanHandle}">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+                    `;
+                } else {
+                    instaBadge = `
+                        <button onclick="handleNoLinkToast(${id}, 'Instagram')" class="w-8 h-8 rounded-full bg-slate-800 text-slate-500 flex items-center justify-center hover:bg-slate-700/60 transition text-sm cursor-help" title="No Instagram connected">
+                            <i class="fa-brands fa-instagram"></i>
+                        </button>
+                    `;
+                }
+
+                let customLinkBadge = '';
+                if (studentSocials.other) {
+                    const targetURL = studentSocials.other.startsWith('http') ? studentSocials.other : `https://${studentSocials.other}`;
+                    customLinkBadge = `
+                        <a href="${targetURL}" target="_blank" class="w-8 h-8 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center hover:scale-110 transition duration-150 text-sm shadow-md" title="External Link Profile">
+                            <i class="fa-solid fa-link"></i>
+                        </a>
+                    `;
+                } else {
+                    customLinkBadge = `
+                        <button onclick="handleNoLinkToast(${id}, 'Secondary Link')" class="w-8 h-8 rounded-full bg-slate-800 text-slate-500 flex items-center justify-center hover:bg-slate-700/60 transition text-sm cursor-help" title="No website connected">
+                            <i class="fa-solid fa-link"></i>
+                        </button>
+                    `;
+                }
+
+                // If Admin Mode is active, show the gears
+                const adminEditAction = isAdminActive ? `
+                    <button onclick="openEditModal(${id})" class="absolute top-2 right-2 w-7 h-7 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center shadow-lg hover:rotate-45 transition duration-200 text-xs border border-white/20 z-10" title="Modify Card Info">
+                        <i class="fa-solid fa-gear"></i>
+                    </button>
+                ` : '';
+
+                return `
+                    <div class="glass-card rounded-2xl overflow-hidden flex flex-col items-center p-5 text-center animate-fade-up relative ${specialCardClass}" style="animation-delay: ${cardDelay};">
+                        
+                        <!-- Admin Action Control -->
+                        ${adminEditAction}
+
+                        <!-- Avatar frame with a glowing custom style for Sabri -->
+                        <div class="avatar-container relative w-24 h-24 mb-4 rounded-full group ${specialAvatarRing}">
+                            
+                            <div class="w-full h-full rounded-full overflow-hidden relative">
+                                ${avatarHTML}
+                                
+                                ${isAdminActive ? `
+                                    <div onclick="openEditModal(${id})" class="avatar-overlay absolute inset-0 bg-slate-950/80 opacity-0 transition-opacity duration-200 flex flex-col items-center justify-center text-white rounded-full cursor-pointer">
+                                        <i class="fa-solid fa-camera text-base mb-1 text-blue-400 animate-pulse"></i>
+                                        <span class="text-[9px] font-extrabold uppercase tracking-widest">Configure</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            
+                            <!-- Index Badge -->
+                            <div class="absolute -bottom-1 -right-1 bg-slate-950 text-[10px] font-black text-slate-300 w-7 h-7 flex items-center justify-center rounded-full border border-slate-700/60">
+                                #${id}
+                            </div>
+                        </div>
+
+                        <!-- Card Info -->
+                        <h3 class="text-base font-bold text-white mb-0.5 truncate max-w-full capitalize tracking-tight" id="display-name-${id}">
+                            ${displayName}
+                        </h3>
+                        <p class="text-xs ${specialTextGlow} mb-4">${isSpecial ? 'VIP Premium Partner' : 'Class Member'}</p>
+
+                        <!-- Social Buttons -->
+                        <div class="flex items-center gap-3 mt-auto">
+                            ${instaBadge}
+                            ${customLinkBadge}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Admin Access Authentication
+        function toggleAdminPrompt() {
+            if (isAdminActive) {
+                isAdminActive = false;
+                sessionStorage.removeItem('3eb-admin-active');
+                setAdminUIState(false);
+                renderRoster();
+                showToast("Admin Mode Locked! Profile changes protected.");
+            } else {
+                document.getElementById('admin-pin-field').value = '';
+                document.getElementById('pin-error-msg').classList.add('hidden');
+                document.getElementById('pin-modal').classList.remove('hidden');
+                document.getElementById('pin-modal').classList.add('flex');
+                document.getElementById('admin-pin-field').focus();
+            }
+        }
+
+        function closePinModal() {
+            document.getElementById('pin-modal').classList.remove('flex');
+            document.getElementById('pin-modal').classList.add('hidden');
+        }
+
+        function submitPinCheck() {
+            const entered = document.getElementById('admin-pin-field').value;
+            if (entered === '3eb2026' || entered === '3EB2026') {
+                isAdminActive = true;
+                sessionStorage.setItem('3eb-admin-active', 'true');
+                setAdminUIState(true);
+                closePinModal();
+                renderRoster();
+                showToast("Admin access unlocked! Click on any student gear to edit.");
+            } else {
+                document.getElementById('pin-error-msg').classList.remove('hidden');
+            }
+        }
+
+        function setAdminUIState(active) {
+            const btnText = document.getElementById('admin-btn-text');
+            const dot = document.getElementById('admin-indicator-dot');
+            const icon = document.getElementById('admin-lock-icon');
+            const btn = document.getElementById('admin-lock-btn');
+
+            if (active) {
+                btnText.textContent = "Admin Active";
+                dot.classList.remove('bg-red-500');
+                dot.classList.add('bg-emerald-500');
+                icon.className = "fa-solid fa-lock-open text-emerald-400";
+                btn.classList.add('border-emerald-500/50');
+            } else {
+                btnText.textContent = "Admin Mode";
+                dot.classList.remove('bg-emerald-500');
+                dot.classList.add('bg-red-500');
+                icon.className = "fa-solid fa-lock text-slate-400";
+                btn.classList.remove('border-emerald-500/50');
+            }
+        }
+
+        // Open Editor Panels
+        function openEditModal(id) {
+            currentEditingId = id;
+            const displayName = customNames[id] || defaultStudentNames[id - 1];
+            const currentPhoto = customPhotos[id];
+            const socials = customLinks[id] || { insta: "", other: "" };
+
+            document.getElementById('edit-name-field').value = displayName;
+            document.getElementById('edit-insta-field').value = socials.insta;
+            document.getElementById('edit-custom-field').value = socials.other;
+
+            tempAvatarDataURL = currentPhoto || null;
+            updateModalAvatarFrame();
+
+            const modal = document.getElementById('edit-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.remove('flex');
+            document.getElementById('edit-modal').classList.add('hidden');
+            currentEditingId = null;
+            tempAvatarDataURL = null;
+        }
+
+        function updateModalAvatarFrame() {
+            const frame = document.getElementById('modal-avatar-frame');
+            if (tempAvatarDataURL) {
+                frame.innerHTML = `<img src="${tempAvatarDataURL}" class="w-full h-full object-cover">`;
+            } else {
+                frame.innerHTML = `
+                    <div class="text-slate-500 flex flex-col items-center">
+                        <i class="fa-solid fa-circle-user text-3xl mb-1"></i>
+                        <span class="text-[10px] font-bold uppercase tracking-wider">No Photo</span>
+                    </div>
+                `;
+            }
+        }
+
+        function triggerEditorUpload() {
+            document.getElementById('universal-file-input').click();
+        }
+
+        // Offscreen Downscale Image Compressors
+        document.getElementById('universal-file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const maxDimension = 200; 
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > maxDimension) {
+                            height *= maxDimension / width;
+                            width = maxDimension;
+                        }
+                    } else {
+                        if (height > maxDimension) {
+                            width *= maxDimension / height;
+                            height = maxDimension;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    tempAvatarDataURL = canvas.toDataURL('image/jpeg', 0.85);
+                    updateModalAvatarFrame();
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+            e.target.value = ''; 
+        });
+
+        // Save Updated Profiles
+        function saveStudentEdits() {
+            if (!currentEditingId) return;
+
+            const nameVal = document.getElementById('edit-name-field').value.trim();
+            const instaVal = document.getElementById('edit-insta-field').value.trim();
+            const customVal = document.getElementById('edit-custom-field').value.trim();
+
+            if (!nameVal) {
+                showToast("Student name cannot be empty!", true);
+                return;
+            }
+
+            customNames[currentEditingId] = nameVal;
+
+            if (tempAvatarDataURL) {
+                customPhotos[currentEditingId] = tempAvatarDataURL;
+            }
+
+            customLinks[currentEditingId] = {
+                insta: instaVal,
+                other: customVal
+            };
+
+            try {
+                localStorage.setItem('3eb-student-names', JSON.stringify(customNames));
+                localStorage.setItem('3eb-student-photos', JSON.stringify(customPhotos));
+                localStorage.setItem('3eb-student-links', JSON.stringify(customLinks));
+                
+                showToast(`Student #${currentEditingId} profile saved locally!`);
+                closeEditModal();
+                renderRoster();
+            } catch (err) {
+                console.error(err);
+                showToast("Storage full! Try using a smaller photo file size.", true);
+            }
+        }
+
+        // Show Toast Notifications
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.textContent = message;
+            if (isError) {
+                toastIcon.innerHTML = '<i class="fa-solid fa-circle-exclamation text-red-400"></i>';
+                toast.classList.add('border-red-900/50');
+            } else {
+                toastIcon.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
+                toast.classList.remove('border-red-900/50');
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function handleNoLinkToast(studentId, platformName) {
+            const displayName = customNames[studentId] || defaultStudentNames[studentId - 1];
+            if (isAdminActive) {
+                showToast(`No link set for ${displayName}. Click gear to add!`);
+            } else {
+                showToast(`Unlock Admin Mode to link ${displayName}'s social pages!`);
+            }
+        }
+
+        // Clear Local Storage Dialog
+        function confirmResetDialog() {
+            const modal = document.getElementById('confirm-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            document.getElementById('cancel-confirm-btn').onclick = function() {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            };
+
+            document.getElementById('execute-confirm-btn').onclick = function() {
+                customPhotos = {};
+                customNames = { 28: "Sabri Rami" };
+                customLinks = {};
+                localStorage.removeItem('3eb-student-photos');
+                localStorage.removeItem('3eb-student-names');
+                localStorage.removeItem('3eb-student-links');
+                
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+                renderRoster();
+                showToast("All custom configurations cleared!");
+            };
+        }
+
+        // Kinetic Ambient Network
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let particles = [];
+        const particleCount = 70;
+        const connectionDistance = 150;
+        let mouse = { x: null, y: null, radius: 180 };
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+        window.addEventListener('mouseout', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                mouse.x = e.touches[0].clientX;
+                mouse.y = e.touches[0].clientY;
+            }
+        });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 2.5 + 1;
+                this.vx = (Math.random() - 0.5) * 0.8;
+                this.vy = (Math.random() - 0.5) * 0.8;
+                this.density = (Math.random() * 30) + 1;
+            }
+
+            draw() {
+                ctx.fillStyle = 'rgba(139, 92, 246, 0.45)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+
+                if (mouse.x != null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < mouse.radius) {
+                        let force = (mouse.radius - distance) / mouse.radius;
+                        let forceDirectionX = dx / distance;
+                        let forceDirectionY = dy / distance;
+                        let directionX = forceDirectionX * force * this.density * 0.5;
+                        let directionY = forceDirectionY * force * this.density * 0.5;
+                        this.x -= directionX;
+                        this.y -= directionY;
+                    }
+                }
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                
+                for (let j = i; j < particles.length; j++) {
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < connectionDistance) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(59, 130, 246, ${(1 - distance/connectionDistance) * 0.18})`;
+                        ctx.lineWidth = 0.7;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        // Initializer Load Bindings
+        window.onload = function() {
+            loadSavedState();
+            renderRoster();
+            initParticles();
+            animate();
+        };
+
+        document.getElementById('admin-pin-field').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitPinCheck();
+            }
+        });
+    </script>
+</body>
+</html>
